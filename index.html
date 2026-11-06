@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NSM Balance</title>
+<meta name="description" content="Live balance of the Zcash Network Sustainability Mechanism (ZIP 237).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --accent: #1e90ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1220;
+      --fg: #e2e8f0;
+      --muted: #94a3b8;
+      --line: #1e293b;
+      --accent: #4aa8ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Raleway, system-ui, sans-serif;
+    font-variant-numeric: lining-nums tabular-nums;
+    padding: 32px 16px;
+  }
+  main { width: 100%; max-width: 640px; }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .balance {
+    margin: 0;
+    font-size: clamp(40px, 11vw, 76px);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--accent);
+    overflow-wrap: anywhere;
+  }
+  .balance small { font-size: 0.4em; font-weight: 600; color: var(--fg); }
+  .meta { margin: 12px 0 32px; color: var(--muted); font-size: 14px; }
+  dl { margin: 0; border-top: 1px solid var(--line); }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  dt { color: var(--muted); }
+  dd { margin: 0; font-weight: 600; text-align: right; }
+  footer { margin-top: 24px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  a { color: var(--accent); }
+  .error { color: #dc2626; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Zcash NSM balance</h1>
+  <p class="balance" id="balance">&hellip;</p>
+  <p class="meta" id="meta">Loading the chain tip.</p>
+  <dl>
+    <div><dt>Seed at NU7 (unclaimed pre-NU6 value)</dt><dd id="seed">&hellip;</dd></div>
+    <div><dt>Removed since NU7 (60% of fees, ZIP 235)</dt><dd id="removed">&hellip;</dd></div>
+    <div><dt>Reissuance starts</dt><dd>block 8,939,664</dd></div>
+  </dl>
+  <footer>
+    The NSM balance is the ZEC removed from circulation and not yet reissued
+    (<a href="https://zips.z.cash/zip-0237">ZIP 237</a>). This page computes it as scheduled
+    issuance minus the sum of the chain value pools at the tip. Chain data comes from
+    <a href="https://blockchair.com/zcash">Blockchair</a>. Built by
+    <a href="https://shieldedlabs.net">Shielded Labs</a>.
+  </footer>
+</main>
+<script>
+  // Mainnet constants in zatoshi (ZIP 237, ZIP 218, ZIP 259).
+  const NU7_HEIGHT = 3543405n;
+  const SCHEDULED_BEFORE_NU7 = 1702657031250000n; // sum of ScheduledBlockSubsidy(0 .. NU7_HEIGHT - 1)
+  const INITIAL_NSM_VALUE_BALANCE = 36858445520n;
+  const NSM_REISSUANCE_HEIGHT = 8939664n;
+  const POST_NU7_HALVING_INTERVAL = 5040000n;
+  const HALVING_OFFSET = 12531015n; // Halving(NU7_HEIGHT) scaled by POST_NU7_HALVING_INTERVAL
+  const MAX_BLOCK_SUBSIDY = 1250000000n;
+  const SUBSIDY_DIVISOR = 6n; // BlossomPoWTargetSpacingRatio * NU7PoWTargetSpacingRatio
+  const API = "https://api.blockchair.com/zcash";
+
+  // Sum of ScheduledBlockSubsidy over NU7_HEIGHT .. height (ZIP 218).
+  function scheduledSinceNu7(height) {
+    let total = 0n;
+    let start = NU7_HEIGHT;
+    let halving = HALVING_OFFSET / POST_NU7_HALVING_INTERVAL;
+    while (start <= height) {
+      const next = NU7_HEIGHT + (halving + 1n) * POST_NU7_HALVING_INTERVAL - HALVING_OFFSET;
+      const end = height < next - 1n ? height : next - 1n;
+      total += (end - start + 1n) * (MAX_BLOCK_SUBSIDY / (SUBSIDY_DIVISOR * 2n ** halving));
+      start = next;
+      halving += 1n;
+    }
+    return total;
+  }
+
+  function zec(zat) {
+    const whole = zat / 100000000n;
+    const frac = (zat % 100000000n).toString().padStart(8, "0");
+    return whole.toLocaleString("en-US") + "." + frac;
+  }
+
+  async function getJson(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(url + " returned " + res.status);
+    return res.json();
+  }
+
+  async function refresh() {
+    try {
+      const stats = await getJson(API + "/stats");
+      const tip = stats.data.best_block_height;
+      const raw = await getJson(API + "/raw/block/" + tip);
+      const block = raw.data[tip].decoded_raw_block;
+      const height = BigInt(block.height);
+      if (height >= NSM_REISSUANCE_HEIGHT) {
+        throw new Error("Reissuance has started. This page does not model it yet.");
+      }
+      const supply = block.valuePools.reduce((sum, pool) => sum + BigInt(pool.chainValueZat), 0n);
+      const nsm = SCHEDULED_BEFORE_NU7 + scheduledSinceNu7(height) - supply;
+      document.getElementById("balance").innerHTML = zec(nsm) + " <small>ZEC</small>";
+      document.getElementById("seed").textContent = zec(INITIAL_NSM_VALUE_BALANCE) + " ZEC";
+      document.getElementById("removed").textContent = zec(nsm - INITIAL_NSM_VALUE_BALANCE) + " ZEC";
+      const time = new Date(block.time * 1000).toLocaleString();
+      document.getElementById("meta").textContent =
+        "At block " + Number(height).toLocaleString("en-US") + ", mined " + time + ".";
+    } catch (err) {
+      const meta = document.getElementById("meta");
+      meta.className = "meta error";
+      meta.textContent = "Could not load the balance: " + err.message;
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 5 * 60 * 1000);
+</script>
+</body>
+</html>
