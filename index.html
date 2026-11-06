@@ -3,94 +3,143 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NSM Balance</title>
-<meta name="description" content="Live balance of the Zcash Network Sustainability Mechanism (ZIP 237).">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;800&display=swap" rel="stylesheet">
+<title>NSM Balance · Shielded Labs</title>
+<meta name="description" content="Live balance of the Zcash Network Sustainability Mechanism (ZIP 237): ZEC removed from circulation and not yet reissued.">
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/newsreader-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+  /* Fonts, tokens and type scale follow shieldedlabs.net ("Foundation Editorial"). */
+  @font-face { font-family: "Geist"; font-style: normal; font-weight: 400 600; font-display: swap; src: url(fonts/geist-normal-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 400 500; font-display: swap; src: url(fonts/geist-mono-normal-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Newsreader"; font-style: normal; font-weight: 300 700; font-display: swap; src: url(fonts/newsreader-normal-latin.woff2) format("woff2"); }
+  @font-face { font-family: "Newsreader"; font-style: italic; font-weight: 360; font-display: swap; src: url(fonts/newsreader-italic-latin.woff2) format("woff2"); }
+
   :root {
-    --bg: #ffffff;
-    --fg: #0f172a;
-    --muted: #64748b;
-    --line: #e2e8f0;
-    --accent: #1e90ff;
+    color-scheme: light;
+    --paper: #F6F4EE; --paper-2: #ECE8DE;
+    --ink: #16150F; --ink-2: #2D2B25; --muted: #5A574E;
+    --rule: #D6D1C4; --rule-2: #BDB7A9;
+    --accent: #7A5A0B; --selection: #E6D8AF;
+    --band: #16150F; --band-ink: #F3F0E8; --band-muted: #ABA699; --band-rule: #3A3832; --band-edge: #16150F;
+    --logo-filter: invert(1); --smoothing: auto;
+    --serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --sans: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --margin: 64px; --measure: 1312px;
+    --fs-lead: clamp(1.25rem, 1.6vw, 1.4375rem);
+    --fs-body: 1.125rem; --fs-small: 1rem; --fs-label: .8125rem;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0b1220;
-      --fg: #e2e8f0;
-      --muted: #94a3b8;
-      --line: #1e293b;
-      --accent: #4aa8ff;
+  @media screen and (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #171612; --paper-2: #24221D;
+      --ink: #EEEAE0; --ink-2: #D6D1C4; --muted: #A39E91;
+      --rule: #34322B; --rule-2: #4D4A41;
+      --accent: #D3B064; --selection: #4A3F22;
+      --band: #0C0B09; --band-ink: #EEEAE0; --band-muted: #A39E91; --band-rule: #2C2A24; --band-edge: #8C877A;
+      --logo-filter: none; --smoothing: antialiased;
     }
   }
-  * { box-sizing: border-box; }
+  @media (max-width: 1180px) { :root { --margin: 40px; } }
+  @media (max-width: 720px) { :root { --margin: 20px; --fs-body: 1.0625rem; --fs-small: .9375rem; } }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--paper); }
   body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: Raleway, system-ui, sans-serif;
-    font-variant-numeric: lining-nums tabular-nums;
-    padding: 32px 16px;
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    background: var(--paper); color: var(--ink-2);
+    font-family: var(--sans); font-size: var(--fs-body); line-height: 1.65;
+    -webkit-font-smoothing: var(--smoothing); text-rendering: optimizeLegibility;
   }
-  main { width: 100%; max-width: 640px; }
-  h1 {
-    margin: 0 0 8px;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+  ::selection { background: var(--selection); color: var(--ink); }
+  h1, p, dl, dd { margin: 0; }
+  p, dd { text-wrap: pretty; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+  .wrap { width: 100%; max-width: calc(var(--measure) + 2 * var(--margin)); margin: 0 auto; padding: 0 var(--margin); }
+  .label { font-family: var(--mono); font-size: var(--fs-label); line-height: 1.4; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .tnum { font-variant-numeric: tabular-nums lining-nums; }
+
+  .site-header { border-bottom: 1px solid var(--rule); }
+  .header-inner { display: flex; align-items: center; min-height: 84px; }
+  .brand img { display: block; width: 168px; height: auto; filter: var(--logo-filter); }
+
+  main { flex: 1; padding: 96px 0 120px; }
+  .eyebrow { color: var(--accent); }
   .balance {
-    margin: 0;
-    font-size: clamp(40px, 11vw, 76px);
-    font-weight: 800;
-    line-height: 1.05;
-    color: var(--accent);
-    overflow-wrap: anywhere;
+    margin-top: 20px;
+    font-family: var(--serif); font-weight: 380; font-optical-sizing: auto;
+    font-size: clamp(2.5rem, 9vw, 7.5rem); line-height: 1; letter-spacing: -.022em;
+    color: var(--ink); overflow-wrap: anywhere;
   }
-  .balance small { font-size: 0.4em; font-weight: 600; color: var(--fg); }
-  .meta { margin: 12px 0 32px; color: var(--muted); font-size: 14px; }
-  dl { margin: 0; border-top: 1px solid var(--line); }
-  dl div {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 15px;
-  }
-  dt { color: var(--muted); }
-  dd { margin: 0; font-weight: 600; text-align: right; }
-  footer { margin-top: 24px; font-size: 13px; line-height: 1.6; color: var(--muted); }
-  a { color: var(--accent); }
-  .error { color: #dc2626; }
+  .balance em { font-style: italic; font-weight: 360; font-size: .45em; letter-spacing: 0; color: var(--muted); white-space: nowrap; }
+  .lead { margin-top: 28px; max-width: 30em; font-family: var(--serif); font-size: var(--fs-lead); line-height: 1.45; color: var(--ink-2); }
+  .lead.error { color: var(--accent); }
+
+  .facts { margin-top: 64px; max-width: 46em; border-bottom: 1px solid var(--rule); }
+  .facts > div { display: grid; grid-template-columns: minmax(9em, 30%) 1fr; gap: 4px 24px; border-top: 1px solid var(--rule); padding: 14px 0; }
+  .facts dt { font-family: var(--mono); font-size: var(--fs-label); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: .3em; }
+  .facts dd { color: var(--ink); }
+  .facts dd span { display: block; font-size: var(--fs-small); color: var(--muted); }
+  @media (max-width: 720px) { .facts > div { grid-template-columns: 1fr; } }
+
+  .note { margin-top: 40px; max-width: 33em; font-size: var(--fs-small); color: var(--muted); }
+  .note a, .more { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; text-decoration-color: var(--rule-2); }
+  .note a:hover, .more:hover { text-decoration-color: var(--ink); }
+  .more { display: inline-block; margin-top: 20px; font-size: var(--fs-small); }
+
+  .site-foot { background: var(--band); color: var(--band-ink); border-top: 1px solid var(--band-edge); }
+  .site-foot :focus-visible { outline-color: var(--band-ink); }
+  .foot { padding: 64px 0 48px; }
+  .foot img { display: block; width: 180px; height: auto; }
+  .foot-line { margin-top: 24px; font-family: var(--serif); font-weight: 360; font-size: clamp(1.5rem, 2vw, 1.75rem); line-height: 1.15; letter-spacing: -.01em; }
+  .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; border-top: 1px solid var(--band-rule); padding: 24px 0 36px; font-size: var(--fs-small); line-height: 1.5; color: var(--band-muted); }
+  .legal-links { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+  .legal a { color: var(--band-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: var(--band-muted); }
 </style>
 </head>
 <body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="https://shieldedlabs.net/"><img src="images/shielded-labs-wordmark.png" width="800" height="200" alt="Shielded Labs, home"></a>
+  </div>
+</header>
+
 <main>
-  <h1>Zcash NSM balance</h1>
-  <p class="balance" id="balance">&hellip;</p>
-  <p class="meta" id="meta">Loading the chain tip.</p>
-  <dl>
-    <div><dt>Seed at NU7 (unclaimed pre-NU6 value)</dt><dd id="seed">&hellip;</dd></div>
-    <div><dt>Removed since NU7 (60% of fees, ZIP 235)</dt><dd id="removed">&hellip;</dd></div>
-    <div><dt>Reissuance starts</dt><dd>block 8,939,664</dd></div>
-  </dl>
-  <footer>
-    The NSM balance is the ZEC removed from circulation and not yet reissued
-    (<a href="https://zips.z.cash/zip-0237">ZIP 237</a>). This page computes it as scheduled
-    issuance minus the sum of the chain value pools at the tip. Chain data comes from
-    <a href="https://blockchair.com/zcash">Blockchair</a>. Built by
-    <a href="https://shieldedlabs.net">Shielded Labs</a>.
-  </footer>
+  <div class="wrap">
+    <p class="label eyebrow">Network Sustainability Mechanism · Zcash mainnet</p>
+    <h1 class="balance tnum" id="balance" aria-live="polite">&hellip;</h1>
+    <p class="lead" id="meta">ZEC removed from circulation and not yet reissued. Loading the chain tip.</p>
+
+    <dl class="facts tnum">
+      <div><dt>Seed at NU7</dt><dd id="seed">&hellip;<span>Block subsidy and fees left unclaimed before NU6</span></dd></div>
+      <div><dt>Removed since NU7</dt><dd id="removed">&hellip;<span>60% of every block's fees (ZIP 235)</span></dd></div>
+      <div><dt>Reissuance</dt><dd>Starts at block 8,939,664<span>A fixed share of the balance each block, on top of the halving schedule (ZIP 237)</span></dd></div>
+    </dl>
+
+    <p class="note">
+      The balance is scheduled issuance minus the sum of the chain value pools at the tip, as defined in
+      <a href="https://zips.z.cash/zip-0237">ZIP 237</a>. Chain data comes from the
+      <a href="https://blockchair.com/zcash">Blockchair</a> API. The page refreshes every five minutes.
+    </p>
+    <a class="more" href="https://shieldedlabs.net/nsm/">About the Network Sustainability Mechanism</a>
+  </div>
 </main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot">
+      <img src="images/shielded-labs-wordmark.png" alt="Shielded Labs" width="800" height="200" decoding="async">
+      <p class="foot-line">Building the future of <em>private money.</em></p>
+    </div>
+    <div class="legal">
+      <span>© 2026 Shielded Labs · Association registered in Zug, Switzerland</span>
+      <span class="legal-links"><a href="https://shieldedlabs.net/">shieldedlabs.net</a> <a href="https://github.com/ShieldedLabs/nsm">Source on GitHub</a></span>
+    </div>
+  </div>
+</footer>
+
 <script>
   // Mainnet constants in zatoshi (ZIP 237, ZIP 218, ZIP 259).
   const NU7_HEIGHT = 3543405n;
@@ -124,6 +173,11 @@
     return whole.toLocaleString("en-US") + "." + frac;
   }
 
+  function setAmount(id, zat) {
+    const dd = document.getElementById(id);
+    dd.firstChild.textContent = zec(zat) + " ZEC";
+  }
+
   async function getJson(url) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(url + " returned " + res.status);
@@ -131,6 +185,7 @@
   }
 
   async function refresh() {
+    const meta = document.getElementById("meta");
     try {
       const stats = await getJson(API + "/stats");
       const tip = stats.data.best_block_height;
@@ -138,19 +193,19 @@
       const block = raw.data[tip].decoded_raw_block;
       const height = BigInt(block.height);
       if (height >= NSM_REISSUANCE_HEIGHT) {
-        throw new Error("Reissuance has started. This page does not model it yet.");
+        throw new Error("reissuance has started, and this page does not model it yet.");
       }
       const supply = block.valuePools.reduce((sum, pool) => sum + BigInt(pool.chainValueZat), 0n);
       const nsm = SCHEDULED_BEFORE_NU7 + scheduledSinceNu7(height) - supply;
-      document.getElementById("balance").innerHTML = zec(nsm) + " <small>ZEC</small>";
-      document.getElementById("seed").textContent = zec(INITIAL_NSM_VALUE_BALANCE) + " ZEC";
-      document.getElementById("removed").textContent = zec(nsm - INITIAL_NSM_VALUE_BALANCE) + " ZEC";
-      const time = new Date(block.time * 1000).toLocaleString();
-      document.getElementById("meta").textContent =
-        "At block " + Number(height).toLocaleString("en-US") + ", mined " + time + ".";
+      document.getElementById("balance").innerHTML = zec(nsm) + " <em>ZEC</em>";
+      setAmount("seed", INITIAL_NSM_VALUE_BALANCE);
+      setAmount("removed", nsm - INITIAL_NSM_VALUE_BALANCE);
+      const time = new Date(block.time * 1000).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+      meta.className = "lead";
+      meta.textContent = "ZEC removed from circulation and not yet reissued, at block " +
+        Number(height).toLocaleString("en-US") + " (" + time + ").";
     } catch (err) {
-      const meta = document.getElementById("meta");
-      meta.className = "meta error";
+      meta.className = "lead error";
       meta.textContent = "Could not load the balance: " + err.message;
     }
   }
