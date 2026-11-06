@@ -1,6 +1,7 @@
 # nsm.shieldedlabs.net
 
 One static page that shows the Zcash NSM Value Balance (ZIP 237) at the chain tip.
+It uses the shieldedlabs.net style: tokens, fonts, wordmark and icons come from ShieldedLabs/website (fonts under the SIL OFL, licenses in `fonts/`).
 
 ## How it works
 
