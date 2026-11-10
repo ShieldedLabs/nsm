@@ -188,9 +188,14 @@
     const meta = document.getElementById("meta");
     try {
       const stats = await getJson(API + "/stats");
-      const tip = stats.data.best_block_height;
-      const raw = await getJson(API + "/raw/block/" + tip);
-      const block = raw.data[tip].decoded_raw_block;
+      // The stats tip can run ahead of the raw block index, which then returns empty data.
+      // Step back until the raw index has the block.
+      let block;
+      for (let h = stats.data.best_block_height; !block; h--) {
+        if (stats.data.best_block_height - h >= 10) throw new Error("Blockchair has no recent raw block.");
+        const raw = await getJson(API + "/raw/block/" + h);
+        block = raw.data[h]?.decoded_raw_block;
+      }
       const height = BigInt(block.height);
       if (height >= NSM_REISSUANCE_HEIGHT) {
         throw new Error("reissuance has started, and this page does not model it yet.");
