@@ -5,14 +5,10 @@ It uses the shieldedlabs.net style: tokens, fonts, wordmark and icons come from 
 
 ## How it works
 
-1. The page reads the tip height and the tip block's chain value pools from the Blockchair API.
-2. It computes scheduled issuance up to the tip (ZIP 218 subsidy from NU7 onward).
-3. NSM balance = scheduled issuance minus the sum of the chain value pools.
+The page reads the tip height and the NSM Value Balance from the zecblock API (`/v1/network/accounting`, field `nsmBalanceZat`, from the node's `getblockchaininfo.nsmValueBalanceZat`).
+The ZIP 237 seed at NU7 activation (block 3,543,405) is 368.58445520 ZEC. Each block after that adds 60% of its fees (ZIP 235).
 
-At NU7 activation (block 3,543,405) this formula gives the ZIP 237 seed, 368.58445520 ZEC, to the zatoshi.
-Each block after that adds 60% of its fees (ZIP 235).
-
-The page stops with an error from the reissuance height (block 8,939,664). Reissuance needs the NSM balance of every prior block, so the formula changes there.
+The page stops with an error from the reissuance height (block 8,939,664), because "Removed since NU7" stops being balance minus seed there.
 
 ## Deploy
 

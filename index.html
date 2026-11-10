@@ -119,9 +119,9 @@
     </dl>
 
     <p class="note">
-      The balance is scheduled issuance minus the sum of the chain value pools at the tip, as defined in
-      <a href="https://zips.z.cash/zip-0237">ZIP 237</a>. Chain data comes from the
-      <a href="https://blockchair.com/zcash">Blockchair</a> API. The page refreshes every five minutes.
+      The balance is the NSM Value Balance of <a href="https://zips.z.cash/zip-0237">ZIP 237</a>, as a full node
+      reports it at the tip. Chain data comes from the
+      <a href="https://zecblock.com/">zecblock</a> API. The page refreshes every five minutes.
     </p>
     <a class="more" href="https://shieldedlabs.net/nsm/">About the Network Sustainability Mechanism</a>
   </div>
@@ -141,31 +141,10 @@
 </footer>
 
 <script>
-  // Mainnet constants in zatoshi (ZIP 237, ZIP 218, ZIP 259).
-  const NU7_HEIGHT = 3543405n;
-  const SCHEDULED_BEFORE_NU7 = 1702657031250000n; // sum of ScheduledBlockSubsidy(0 .. NU7_HEIGHT - 1)
+  // Mainnet constants in zatoshi (ZIP 237).
   const INITIAL_NSM_VALUE_BALANCE = 36858445520n;
   const NSM_REISSUANCE_HEIGHT = 8939664n;
-  const POST_NU7_HALVING_INTERVAL = 5040000n;
-  const HALVING_OFFSET = 12531015n; // Halving(NU7_HEIGHT) scaled by POST_NU7_HALVING_INTERVAL
-  const MAX_BLOCK_SUBSIDY = 1250000000n;
-  const SUBSIDY_DIVISOR = 6n; // BlossomPoWTargetSpacingRatio * NU7PoWTargetSpacingRatio
-  const API = "https://api.blockchair.com/zcash";
-
-  // Sum of ScheduledBlockSubsidy over NU7_HEIGHT .. height (ZIP 218).
-  function scheduledSinceNu7(height) {
-    let total = 0n;
-    let start = NU7_HEIGHT;
-    let halving = HALVING_OFFSET / POST_NU7_HALVING_INTERVAL;
-    while (start <= height) {
-      const next = NU7_HEIGHT + (halving + 1n) * POST_NU7_HALVING_INTERVAL - HALVING_OFFSET;
-      const end = height < next - 1n ? height : next - 1n;
-      total += (end - start + 1n) * (MAX_BLOCK_SUBSIDY / (SUBSIDY_DIVISOR * 2n ** halving));
-      start = next;
-      halving += 1n;
-    }
-    return total;
-  }
+  const API = "https://api.zecblock.com/v1/network/accounting";
 
   function zec(zat) {
     const whole = zat / 100000000n;
@@ -187,25 +166,16 @@
   async function refresh() {
     const meta = document.getElementById("meta");
     try {
-      const stats = await getJson(API + "/stats");
-      // The stats tip can run ahead of the raw block index, which then returns empty data.
-      // Step back until the raw index has the block.
-      let block;
-      for (let h = stats.data.best_block_height; !block; h--) {
-        if (stats.data.best_block_height - h >= 10) throw new Error("Blockchair has no recent raw block.");
-        const raw = await getJson(API + "/raw/block/" + h);
-        block = raw.data[h]?.decoded_raw_block;
-      }
-      const height = BigInt(block.height);
+      const { data } = await getJson(API);
+      const height = BigInt(data.nodeHeight);
       if (height >= NSM_REISSUANCE_HEIGHT) {
         throw new Error("reissuance has started, and this page does not model it yet.");
       }
-      const supply = block.valuePools.reduce((sum, pool) => sum + BigInt(pool.chainValueZat), 0n);
-      const nsm = SCHEDULED_BEFORE_NU7 + scheduledSinceNu7(height) - supply;
+      const nsm = BigInt(data.nsmBalanceZat);
       document.getElementById("balance").innerHTML = zec(nsm) + " <em>ZEC</em>";
       setAmount("seed", INITIAL_NSM_VALUE_BALANCE);
       setAmount("removed", nsm - INITIAL_NSM_VALUE_BALANCE);
-      const time = new Date(block.time * 1000).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+      const time = new Date(data.observedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
       meta.className = "lead";
       meta.textContent = "ZEC removed from circulation and not yet reissued, at block " +
         Number(height).toLocaleString("en-US") + " (" + time + ").";
