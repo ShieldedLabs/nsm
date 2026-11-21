@@ -21,7 +21,7 @@
     --ink: #16150F; --ink-2: #2D2B25; --muted: #5A574E;
     --rule: #D6D1C4; --rule-2: #BDB7A9;
     --accent: #7A5A0B; --selection: #E6D8AF;
-    --band: #16150F; --band-ink: #F3F0E8; --band-muted: #ABA699; --band-rule: #3A3832; --band-edge: #16150F;
+    --band: #16150F; --band-ink: #F3F0E8; --band-muted: #ABA699; --band-rule: #3A3832; --band-edge: #16150F; --band-accent: #D3B064;
     --logo-filter: invert(1); --smoothing: auto;
     --serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     --sans: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -91,11 +91,28 @@
 
   .site-foot { background: var(--band); color: var(--band-ink); border-top: 1px solid var(--band-edge); }
   .site-foot :focus-visible { outline-color: var(--band-ink); }
-  .foot { padding: 64px 0 48px; }
-  .foot img { display: block; width: 180px; height: auto; }
-  .foot-line { margin-top: 24px; font-family: var(--serif); font-weight: 360; font-size: clamp(1.5rem, 2vw, 1.75rem); line-height: 1.15; letter-spacing: -.01em; }
+  /* Project directory: same layout as the governance.shieldedlabs.net footer. */
+  .foot { display: grid; grid-template-columns: minmax(220px, .85fr) minmax(0, 1.6fr); align-items: start; gap: clamp(24px, 6vw, 84px); padding: 56px 0 44px; }
+  .foot a { color: inherit; text-decoration: none; }
+  .foot .label { color: var(--band-muted); }
+  .foot i { font-style: normal; font-size: .8em; }
+  .foot-labs { display: block; width: fit-content; margin-top: 4px; }
+  .foot-labs img { display: block; width: 200px; height: auto; margin-left: -6px; }
+  .foot-domain { display: block; margin: -8px 0 0 38px; font-size: var(--fs-small); line-height: 1.4; color: var(--band-accent); }
+  .ring-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .ring-head a { padding: 4px 0; }
+  .ring-github { display: inline-flex; align-items: center; gap: 6px; }
+  .ring-github svg { width: 16px; height: 16px; fill: currentColor; }
+  .ring { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 24px; margin-top: 8px; }
+  .ring a { display: block; padding: 8px 0 4px; }
+  .ring-title { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.5rem; line-height: 1.15; letter-spacing: -.01em; color: var(--band-ink); }
+  .ring-title i { margin-left: 2px; font-family: var(--sans); font-size: .6em; color: var(--band-muted); }
+  .ring-topic { display: block; margin-top: 4px; font-size: var(--fs-small); line-height: 1.4; color: var(--band-muted); }
+  .ring a:hover .ring-title, .foot-labs:hover .foot-domain { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+  .ring-head a:hover { color: var(--band-ink); }
+  @media (max-width: 720px) { .foot { grid-template-columns: 1fr; gap: 32px; padding: 40px 0 32px; } }
+  @media (max-width: 440px) { .ring { grid-template-columns: 1fr; gap: 0; } }
   .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; border-top: 1px solid var(--band-rule); padding: 24px 0 36px; font-size: var(--fs-small); line-height: 1.5; color: var(--band-muted); }
-  .legal-links { display: flex; flex-wrap: wrap; gap: 12px 24px; }
   .legal a { color: var(--band-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: var(--band-muted); }
 </style>
 </head>
@@ -130,12 +147,28 @@
 <footer class="site-foot">
   <div class="wrap">
     <div class="foot">
-      <img src="images/shielded-labs-wordmark.png" alt="Shielded Labs" width="800" height="200" decoding="async">
-      <p class="foot-line">Building the future of <em>private money.</em></p>
+      <div>
+        <span class="label">Maintained by</span>
+        <a class="foot-labs" href="https://shieldedlabs.net/">
+          <img src="images/shielded-labs-wordmark.png" alt="Shielded Labs" width="800" height="200" decoding="async">
+          <span class="foot-domain">shieldedlabs.net <i aria-hidden="true">↗</i></span>
+        </a>
+      </div>
+      <div>
+        <div class="ring-head">
+          <a class="label" id="foot-projects" href="https://shieldedlabs.net/projects/">Explore our projects <i aria-hidden="true">↗</i></a>
+          <a class="label ring-github" href="https://github.com/ShieldedLabs" aria-label="Shielded Labs on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg>GitHub <i aria-hidden="true">↗</i></a>
+        </div>
+        <nav class="ring" aria-labelledby="foot-projects">
+          <a href="https://governance.shieldedlabs.net/"><span class="ring-title">Governance <i aria-hidden="true">↗</i></span><span class="ring-topic">Poll turnout</span></a>
+          <a href="https://shieldedlabs.net/crosslink/"><span class="ring-title">Crosslink <i aria-hidden="true">↗</i></span><span class="ring-topic">Hybrid consensus</span></a>
+          <a href="https://shieldedlabs.net/epoch-future-proof-cryptography-for-zcash/"><span class="ring-title">Epoch <i aria-hidden="true">↗</i></span><span class="ring-topic">Post-quantum cryptography</span></a>
+        </nav>
+      </div>
     </div>
     <div class="legal">
       <span>© 2026 Shielded Labs · Association registered in Zug, Switzerland</span>
-      <span class="legal-links"><a href="https://shieldedlabs.net/">shieldedlabs.net</a> <a href="https://github.com/ShieldedLabs/nsm">Source on GitHub</a></span>
+      <a href="https://github.com/ShieldedLabs/nsm">Source on GitHub</a>
     </div>
   </div>
 </footer>
