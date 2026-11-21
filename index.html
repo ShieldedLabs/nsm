@@ -89,21 +89,47 @@
   .note a:hover, .more:hover { text-decoration-color: var(--ink); }
   .more { display: inline-block; margin-top: 20px; font-size: var(--fs-small); }
 
-  .site-foot { background: var(--band); color: var(--band-ink); border-top: 1px solid var(--band-edge); }
-  .site-foot :focus-visible { outline-color: var(--band-ink); }
-  .foot { display: grid; grid-template-columns: 1fr 2fr; gap: 32px 64px; padding: 56px 0 44px; }
-  .foot .label { display: flex; justify-content: space-between; color: var(--band-muted); }
-  .foot img { display: block; width: 200px; height: auto; margin-top: 12px; }
-  .foot a { color: inherit; text-decoration: none; }
-  .foot a:hover strong, .foot .label a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
-  .foot nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 24px; }
-  .foot nav .label { grid-column: 1 / -1; }
-  .foot nav > a { font-size: var(--fs-small); color: var(--band-muted); }
-  .foot strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.5rem; line-height: 1.3; color: var(--band-ink); }
-  @media (max-width: 720px) { .foot { grid-template-columns: 1fr; } }
-  @media (max-width: 440px) { .foot nav { grid-template-columns: 1fr; } }
-  .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; border-top: 1px solid var(--band-rule); padding: 24px 0 36px; font-size: var(--fs-small); line-height: 1.5; color: var(--band-muted); }
-  .legal a { color: var(--band-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: var(--band-muted); }
+  .site-foot { background: var(--paper); color: var(--ink); }
+  .foot {
+    display: grid; grid-template-columns: minmax(220px, .85fr) minmax(0, 1.6fr);
+    align-items: start; gap: clamp(24px, 6vw, 84px); padding: 20px 0;
+  }
+  .site-foot a { color: inherit; text-decoration: none; }
+  .foot-caption, .foot-heading { color: var(--muted); font-size: .8125rem; font-weight: 550; }
+  .foot-caption, .foot-heading > a:first-child { letter-spacing: .035em; }
+  .foot-brand { display: inline-flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .foot-brand img { width: 34px; height: 34px; flex: none; }
+  .foot-brand strong { display: block; font-size: clamp(1.375rem, 2.1vw, 1.75rem); line-height: 1.1; letter-spacing: -.035em; }
+  .foot-domain { display: block; margin-top: 2px; color: var(--accent); font-size: .875rem; }
+  .site-foot i { font-style: normal; font-size: .8em; }
+  .foot-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding-bottom: 4px; }
+  .foot-heading a { padding: 4px 0; }
+  .foot-github { display: inline-flex; align-items: center; gap: 5px; }
+  .foot-github::before {
+    content: ""; width: 16px; height: 16px; background-color: currentColor;
+    mask: url(images/github-mark-16.svg) center / contain no-repeat;
+  }
+  .foot-projects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .foot-projects a { padding: 8px 0 4px; line-height: 1.25; }
+  .foot-projects strong { font-size: 1.125rem; font-weight: 600; letter-spacing: -.025em; }
+  .foot-projects i { margin-left: 2px; color: var(--muted); }
+  .foot-topic { display: block; margin-top: 3px; color: var(--muted); font-size: .8125rem; line-height: 1.4; }
+  .foot-brand:hover .foot-domain, .foot-heading a:hover, .foot-projects a:hover strong, .legal a:hover {
+    text-decoration: underline; text-underline-offset: .2em;
+  }
+  .legal {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+    gap: 6px 24px; padding: 4px 0 20px; color: var(--muted); font-size: .8125rem;
+  }
+  .legal a { text-decoration: underline; text-underline-offset: .2em; }
+  @media (max-width: 800px) {
+    .foot { grid-template-columns: 1fr; gap: 14px; padding: 16px 0; }
+  }
+  @media (max-width: 520px) {
+    .foot-projects { grid-template-columns: 1fr; gap: 0; }
+    .foot-projects a { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 0; }
+    .foot-topic { margin: 0; text-align: right; }
+  }
 </style>
 </head>
 <body>
@@ -134,19 +160,27 @@
   </div>
 </main>
 
-<footer class="site-foot">
+<footer class="site-foot" id="site-footer">
   <div class="wrap">
     <div class="foot">
       <div>
-        <p class="label">Maintained by</p>
-        <a href="https://shieldedlabs.net/"><img src="images/shielded-labs-wordmark.png" alt="Shielded Labs" width="800" height="200" decoding="async"></a>
+        <p class="foot-caption">Maintained by</p>
+        <a class="foot-brand" href="https://shieldedlabs.net/">
+          <img src="images/shielded-labs-shield.png" width="34" height="34" alt="">
+          <span><strong>Shielded Labs</strong><span class="foot-domain">shieldedlabs.net <i aria-hidden="true">↗</i></span></span>
+        </a>
       </div>
-      <nav aria-labelledby="foot-projects">
-        <p class="label"><a id="foot-projects" href="https://shieldedlabs.net/projects/">Explore our projects ↗</a> <a href="https://github.com/ShieldedLabs">GitHub ↗</a></p>
-        <a href="https://governance.shieldedlabs.net/"><strong>Governance ↗</strong>Poll turnout</a>
-        <a href="https://shieldedlabs.net/crosslink/"><strong>Crosslink ↗</strong>Hybrid consensus</a>
-        <a href="https://shieldedlabs.net/epoch-future-proof-cryptography-for-zcash/"><strong>Epoch ↗</strong>Post-quantum cryptography</a>
-      </nav>
+      <div>
+        <div class="foot-heading">
+          <a id="foot-projects" href="https://shieldedlabs.net/projects/">Explore our projects <i aria-hidden="true">↗</i></a>
+          <a class="foot-github" href="https://github.com/ShieldedLabs" aria-label="Shielded Labs on GitHub">GitHub <i aria-hidden="true">↗</i></a>
+        </div>
+        <nav class="foot-projects" aria-labelledby="foot-projects">
+          <a href="https://governance.shieldedlabs.net/"><strong>Zcash Governance <i aria-hidden="true">↗</i></strong><span class="foot-topic">Poll turnout</span></a>
+          <a href="https://shieldedlabs.net/crosslink/"><strong>Crosslink <i aria-hidden="true">↗</i></strong><span class="foot-topic">Hybrid consensus</span></a>
+          <a href="https://shieldedlabs.net/epoch-future-proof-cryptography-for-zcash/"><strong>Epoch <i aria-hidden="true">↗</i></strong><span class="foot-topic">Post-quantum cryptography</span></a>
+        </nav>
+      </div>
     </div>
     <div class="legal">
       <span>© 2026 Shielded Labs · Association registered in Zug, Switzerland</span>
