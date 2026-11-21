@@ -114,14 +114,10 @@
   .foot-projects strong { font-size: 1.125rem; font-weight: 600; letter-spacing: -.025em; }
   .foot-projects i { margin-left: 2px; color: var(--muted); }
   .foot-topic { display: block; margin-top: 3px; color: var(--muted); font-size: .8125rem; line-height: 1.4; }
-  .foot-brand:hover .foot-domain, .foot-heading a:hover, .foot-projects a:hover strong, .legal a:hover {
+  .foot-brand:hover .foot-domain, .foot-heading a:hover, .foot-projects a:hover strong {
     text-decoration: underline; text-underline-offset: .2em;
   }
-  .legal {
-    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
-    gap: 6px 24px; padding: 4px 0 20px; color: var(--muted); font-size: .8125rem;
-  }
-  .legal a { text-decoration: underline; text-underline-offset: .2em; }
+  .legal { padding: 4px 0 20px; color: var(--muted); font-size: .8125rem; }
   @media (max-width: 800px) {
     .foot { grid-template-columns: 1fr; gap: 14px; padding: 16px 0; }
   }
@@ -182,10 +178,7 @@
         </nav>
       </div>
     </div>
-    <div class="legal">
-      <span>© 2026 Shielded Labs · Association registered in Zug, Switzerland</span>
-      <a href="https://github.com/ShieldedLabs/nsm">Source on GitHub</a>
-    </div>
+    <p class="legal">© 2026 Shielded Labs · Association registered in Zug, Switzerland</p>
   </div>
 </footer>
 
